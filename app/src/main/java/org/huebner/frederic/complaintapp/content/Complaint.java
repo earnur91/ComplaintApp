@@ -5,6 +5,8 @@ package org.huebner.frederic.complaintapp.content;
  */
 public class Complaint {
     // Database column names
+    public static final String ID = "_id";
+
     public static final String NAME = "NAME";
 
     public static final String LOCATION = "LOCATION";
