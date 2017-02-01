@@ -19,7 +19,16 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        
+        db.execSQL("CREATE TABLE " + Complaint.TABLE_NAME + " ("
+        + Complaint.ID + " INTEGER PRIMARY KEY,"
+        + Complaint.SERVER_ID + " LONG,"
+        + Complaint.SERVER_VERSION + " LONG,"
+        + Complaint.CONFLICT_SERVER_VERSION + " LONG,"
+        + Complaint.SYNC_STATE + " TEXT,"
+        + Complaint.NAME + " TEXT,"
+        + Complaint.LOCATION + " TEXT,"
+        + Complaint.COMPLAINT_TEXT + " TEXT"
+        + ");");
     }
 
     @Override
