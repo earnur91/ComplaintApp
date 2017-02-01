@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /**
- *
+ * Class that creates and upgrades the local database.
  */
 public class SQLiteHelper extends SQLiteOpenHelper {
 
@@ -33,6 +33,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+        db.execSQL("DROP TABLE IF EXISTS " + Complaint.TABLE_NAME);
+        onCreate(db);
     }
 }
