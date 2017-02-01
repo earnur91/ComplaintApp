@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ComplaintApp</string>
+    <string name="no_complaints">Bisher keine Beschwerden.</string>
 </resources>
