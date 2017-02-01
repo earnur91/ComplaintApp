@@ -16,6 +16,13 @@
             </intent-filter>
         </activity>
 
+        <provider
+            android:name="org.huebner.frederic.complaintapp.content.ComplaintContentProvider"
+            android:authorities="org.huebner.frederic.complaintapp.content"
+            android:label="@string/app_name"
+            android:syncable="true" >
+        </provider>
+
         <service android:name="org.huebner.frederic.complaintapp.sync.SyncService" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
