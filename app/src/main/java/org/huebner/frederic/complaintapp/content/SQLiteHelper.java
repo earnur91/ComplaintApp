@@ -13,22 +13,23 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     static final int DATABASE_VERSION = 3;
 
-    SQLiteHelper (Context context) {
+    SQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + Complaint.TABLE_NAME + " ("
-        + Complaint.ID + " INTEGER PRIMARY KEY,"
-        + Complaint.SERVER_ID + " LONG,"
-        + Complaint.SERVER_VERSION + " LONG,"
-        + Complaint.CONFLICT_SERVER_VERSION + " LONG,"
-        + Complaint.SYNC_STATE + " TEXT,"
-        + Complaint.NAME + " TEXT,"
-        + Complaint.LOCATION + " TEXT,"
-        + Complaint.COMPLAINT_TEXT + " TEXT"
-        + ");");
+                + Complaint.ID + " INTEGER PRIMARY KEY,"
+                + Complaint.SERVER_ID + " LONG,"
+                + Complaint.SERVER_VERSION + " LONG,"
+                + Complaint.CONFLICT_SERVER_VERSION + " LONG,"
+                + Complaint.SYNC_STATE + " TEXT,"
+                + Complaint.NAME + " TEXT,"
+                + Complaint.LOCATION + " TEXT,"
+                + Complaint.COMPLAINT_TEXT + " TEXT,"
+                + Complaint.PROCESSING_STATUS + " TEXT"
+                + ");");
     }
 
     @Override
