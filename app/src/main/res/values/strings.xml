@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">ComplaintApp</string>
     <string name="no_complaints">Bisher keine Beschwerden.</string>
+    <string name="sync_now">Synchronisieren</string>
+    <string name="create_complaint">Erstellen</string>
+    <string name="icon_description">Status Icon</string>
 </resources>
