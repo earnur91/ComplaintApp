@@ -22,7 +22,7 @@ import static org.huebner.frederic.complaintapp.content.Complaint.ComplaintFromJ
  * Rest client for backend communication
  */
 public class RestClient {
-    private static final String BACKEND_HOST = "localhost";
+    private static final String BACKEND_HOST = "192.168.2.12";
     public static final int TIMEOUT = 6000; // ms
 
     /**
