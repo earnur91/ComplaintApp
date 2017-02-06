@@ -1,12 +1,33 @@
 package org.huebner.frederic.complaintapp;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 
+import org.huebner.frederic.complaintapp.content.Complaint;
+import org.huebner.frederic.complaintapp.content.ComplaintAdapter;
+import org.huebner.frederic.complaintapp.content.ComplaintContentProvider;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
+
+    public static final String AUTHORITY = ComplaintContentProvider.AUTHORITY;
+    public static final String ACCOUNT_TYPE = "complaint.account";
+    public static final String ACCOUNT ="dummy";
+
+    private RecyclerView recyclerView;
+    private ComplaintAdapter complaintAdapter;
+    private List<Complaint> complaintList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -14,6 +35,32 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.complaint_toolbar);
         setSupportActionBar(toolbar);
+
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        complaintAdapter = new ComplaintAdapter(complaintList, getApplicationContext());
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(complaintAdapter);
+
+        // Testing stuff
+//        Complaint complaint = new Complaint();
+//        complaint.setName("Frederic Hübner");
+//        complaint.setLocation("Münster");
+//        complaint.setComplaintText("Meine allererste Beschwerde!");
+//        complaint.setProcessingStatus(ProcessingStatus.CREATED);
+//        complaintList.add(complaint);
+//        complaintAdapter.notifyDataSetChanged();
+//
+//        Account account = createSyncAccount(this);
+//
+//        Bundle extras = new Bundle();
+//        extras.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+//        extras.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+//
+//        ContentResolver.setIsSyncable(account, ComplaintContentProvider.AUTHORITY, 1);
+//        ContentResolver.requestSync(account, ComplaintContentProvider.AUTHORITY, extras);
+
     }
 
     @Override
@@ -35,6 +82,25 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+    }
+
+    public static Account createSyncAccount(Context context) {
+        Account account = new Account(ACCOUNT, ACCOUNT_TYPE);
+        AccountManager accountManager = (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
+        if (accountManager.addAccountExplicitly(account, null, null)) {
+            /*
+             * If you don't set android:syncable="true" in
+             * in your <provider> element in the manifest,
+             * then call context.setIsSyncable(account, AUTHORITY, 1)
+             * here.
+             */
+        } else {
+            /*
+             * The account exists or some other error occurred. Log this, report it,
+             * or handle it internally.
+             */
+        }
+        return account;
     }
 
 }
