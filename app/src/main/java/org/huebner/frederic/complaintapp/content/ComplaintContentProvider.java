@@ -101,8 +101,7 @@ public class ComplaintContentProvider extends ContentProvider {
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
 
-        // In case of existing Android observer, tell UI that something has changed:
-        // getContext().getContentResolver().notifyChange(uri, null);
+        getContext().getContentResolver().notifyChange(uri, null);
         return Uri.parse(BASE_PATH + "/" + id);
     }
 
@@ -131,8 +130,8 @@ public class ComplaintContentProvider extends ContentProvider {
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
 
-        // In case of existing Android observer, tell UI that something has changed:
-        // getContext().getContentResolver().notifyChange(uri, null);
+
+        getContext().getContentResolver().notifyChange(uri, null);
         return rowsDeleted;
     }
 
@@ -162,8 +161,8 @@ public class ComplaintContentProvider extends ContentProvider {
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
 
-        // In case of existing Android observer, tell UI that something has changed:
-        // getContext().getContentResolver().notifyChange(uri, null);
+
+        getContext().getContentResolver().notifyChange(uri, null);
         return rowsUpdated;
     }
 }
