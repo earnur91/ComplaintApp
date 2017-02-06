@@ -2,7 +2,9 @@ package org.huebner.frederic.complaintapp;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +13,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
 
 import org.huebner.frederic.complaintapp.content.Complaint;
 import org.huebner.frederic.complaintapp.content.ComplaintAdapter;
@@ -23,10 +26,12 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String AUTHORITY = ComplaintContentProvider.AUTHORITY;
     public static final String ACCOUNT_TYPE = "complaint.account";
-    public static final String ACCOUNT ="dummy";
+    public static final String ACCOUNT = "dummy";
 
     private RecyclerView recyclerView;
+    private Account account;
     private ComplaintAdapter complaintAdapter;
+    private Cursor cursor;
     private List<Complaint> complaintList = new ArrayList<>();
 
     @Override
@@ -36,31 +41,10 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.complaint_toolbar);
         setSupportActionBar(toolbar);
 
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        complaintAdapter = new ComplaintAdapter(complaintList, getApplicationContext());
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(complaintAdapter);
+        // Dummy account for synchronisation
+        account = createSyncAccount(this);
 
-        // Testing stuff
-//        Complaint complaint = new Complaint();
-//        complaint.setName("Frederic Hübner");
-//        complaint.setLocation("Münster");
-//        complaint.setComplaintText("Meine allererste Beschwerde!");
-//        complaint.setProcessingStatus(ProcessingStatus.CREATED);
-//        complaintList.add(complaint);
-//        complaintAdapter.notifyDataSetChanged();
-//
-//        Account account = createSyncAccount(this);
-//
-//        Bundle extras = new Bundle();
-//        extras.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-//        extras.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-//
-//        ContentResolver.setIsSyncable(account, ComplaintContentProvider.AUTHORITY, 1);
-//        ContentResolver.requestSync(account, ComplaintContentProvider.AUTHORITY, extras);
-
+        setup();
     }
 
     @Override
@@ -75,6 +59,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_sync:
+                doManualSync();
+                return true;
+            case R.id.action_create:
+                // TODO: implement
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
     }
@@ -83,6 +80,42 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
     }
+
+    private void setup() {
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        complaintAdapter = new ComplaintAdapter(complaintList, getApplicationContext());
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(complaintAdapter);
+        cursor = getContentResolver().query(
+                ComplaintContentProvider.CONTENT_URI,
+                null,
+                null,
+                null,
+                Complaint.ID
+        );
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+                    Complaint complaint = Complaint.fromCursor(cursor);
+                    complaintList.add(complaint);
+                } while (cursor.moveToNext());
+            }
+            complaintAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private void doManualSync() {
+        Bundle extras = new Bundle();
+        extras.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        extras.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        ContentResolver.requestSync(account, ComplaintContentProvider.AUTHORITY, extras);
+
+        // TODO: Implement UI update
+    }
+
 
     public static Account createSyncAccount(Context context) {
         Account account = new Account(ACCOUNT, ACCOUNT_TYPE);
