@@ -1,2 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<sync-adapter xmlns:android="http://schemas.android.com/apk/res/android" />
+<sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accountType="complaint.account"
+    android:allowParallelSyncs="false"
+    android:contentAuthority="org.huebner.frederic.complaintapp.content"
+    android:isAlwaysSyncable="true"
+    android:supportsUploading="true" />
