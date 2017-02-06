@@ -37,7 +37,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
-        // TODO: Implement sync strategy here
         Log.d(TAG, "*---------- Synchronization started ----------*");
 
         syncCreatedEntities(provider, syncResult);
