@@ -84,10 +84,12 @@ public class MainActivity extends AppCompatActivity {
     private void setup() {
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         complaintAdapter = new ComplaintAdapter(complaintList, getApplicationContext());
+
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(complaintAdapter);
+
         cursor = getContentResolver().query(
                 ComplaintContentProvider.CONTENT_URI,
                 null,
@@ -103,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
                     complaintList.add(complaint);
                 } while (cursor.moveToNext());
             }
+            cursor.close();
             complaintAdapter.notifyDataSetChanged();
         }
     }
@@ -112,8 +115,28 @@ public class MainActivity extends AppCompatActivity {
         extras.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
         extras.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
         ContentResolver.requestSync(account, ComplaintContentProvider.AUTHORITY, extras);
+        complaintList.clear();
+        complaintAdapter.notifyDataSetChanged();
+        cursor = getContentResolver().query(
+                ComplaintContentProvider.CONTENT_URI,
+                null,
+                null,
+                null,
+                Complaint.ID
+        );
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+                    Complaint complaint = Complaint.fromCursor(cursor);
+                    complaintList.add(complaint);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            complaintAdapter.notifyDataSetChanged();
+        }
 
-        // TODO: Implement UI update
+
+        // TODO: Implement UI update, maybe LoaderManager
     }
 
 
