@@ -45,6 +45,7 @@ public class CreateComplaintActivity extends AppCompatActivity {
         contentValues.put(Complaint.LOCATION, locationEdit.getText().toString());
         contentValues.put(Complaint.COMPLAINT_TEXT, complaintTextEdit.getText().toString());
         contentValues.put(Complaint.PROCESSING_STATUS, ProcessingStatus.CREATED.name());
+        contentValues.put(Complaint.SYNC_STATE, SyncState.CREATE.name());
         getContentResolver().insert(ComplaintContentProvider.CONTENT_URI, contentValues);
 
         requestUpload();
