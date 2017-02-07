@@ -82,7 +82,7 @@ public class ComplaintContentProvider extends ContentProvider {
 
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
         Cursor cursor = queryBuilder.query(db, projection, selection, selectionArgs, null, null, sortOrder);
-        // cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
     }
 

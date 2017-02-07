@@ -1,10 +1,9 @@
 package org.huebner.frederic.complaintapp;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.content.ContentResolver;
-import android.content.Context;
+import android.app.LoaderManager;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -16,22 +15,16 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import org.huebner.frederic.complaintapp.authenticator.StubAuthenticatorService;
+import org.huebner.frederic.complaintapp.adapter.ComplaintCursorAdapter;
 import org.huebner.frederic.complaintapp.content.Complaint;
-import org.huebner.frederic.complaintapp.content.ComplaintAdapter;
 import org.huebner.frederic.complaintapp.content.ComplaintContentProvider;
-import org.huebner.frederic.complaintapp.sync.SyncService;
+import org.huebner.frederic.complaintapp.content.SyncState;
 import org.huebner.frederic.complaintapp.sync.SyncUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private RecyclerView recyclerView;
-    private ComplaintAdapter complaintAdapter;
-    private Cursor cursor;
-    private List<Complaint> complaintList = new ArrayList<>();
+    private ComplaintCursorAdapter cursorAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +36,16 @@ public class MainActivity extends AppCompatActivity {
         // Dummy account for synchronisation
         SyncUtils.CreateSyncAccount(this);
 
-        setup();
+        // RecyclerView Setup
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        getLoaderManager().initLoader(0, null, this);
+        cursorAdapter = new ComplaintCursorAdapter(this, null);
+
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(cursorAdapter);
+
     }
 
     @Override
@@ -85,61 +87,31 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
-    private void setup() {
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        complaintAdapter = new ComplaintAdapter(complaintList, getApplicationContext());
-
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(complaintAdapter);
-
-        cursor = getContentResolver().query(
-                ComplaintContentProvider.CONTENT_URI,
-                null,
-                null,
-                null,
-                Complaint.ID
-        );
-
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                do {
-                    Complaint complaint = Complaint.fromCursor(cursor);
-                    complaintList.add(complaint);
-                } while (cursor.moveToNext());
-            }
-            cursor.close();
-            complaintAdapter.notifyDataSetChanged();
-        }
+    private void doManualSync() {
+        SyncUtils.TriggerRefresh(true);
     }
 
-    private void doManualSync() {
-        Bundle extras = new Bundle();
-        extras.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        extras.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        ContentResolver.requestSync(StubAuthenticatorService.GetAccount(), ComplaintContentProvider.AUTHORITY, extras);
-        complaintList.clear();
-        complaintAdapter.notifyDataSetChanged();
-        cursor = getContentResolver().query(
-                ComplaintContentProvider.CONTENT_URI,
-                null,
-                null,
-                null,
-                Complaint.ID
-        );
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                do {
-                    Complaint complaint = Complaint.fromCursor(cursor);
-                    complaintList.add(complaint);
-                } while (cursor.moveToNext());
-            }
-            cursor.close();
-            complaintAdapter.notifyDataSetChanged();
-        }
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        // Fields from the database (projection)
+        // Must include the _id column for the adapter to work
+        String[] projection = {Complaint.ID, Complaint.NAME, Complaint.LOCATION, Complaint.COMPLAINT_TEXT, Complaint.PROCESSING_STATUS, Complaint.SYNC_STATE};
 
+        CursorLoader cursorLoader = new CursorLoader(this,
+                ComplaintContentProvider.CONTENT_URI, projection,
+                Complaint.SYNC_STATE + " != ?",
+                new String[]{SyncState.DELETE.name()}, Complaint.ID
+                + " COLLATE NOCASE ASC");
+        return cursorLoader;
+    }
 
-        // TODO: Implement UI update, maybe LoaderManager
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        cursorAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        cursorAdapter.swapCursor(null);
     }
 }
