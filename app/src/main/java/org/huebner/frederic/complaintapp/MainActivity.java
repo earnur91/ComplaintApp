@@ -16,21 +16,19 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.huebner.frederic.complaintapp.authenticator.StubAuthenticatorService;
 import org.huebner.frederic.complaintapp.content.Complaint;
 import org.huebner.frederic.complaintapp.content.ComplaintAdapter;
 import org.huebner.frederic.complaintapp.content.ComplaintContentProvider;
+import org.huebner.frederic.complaintapp.sync.SyncService;
+import org.huebner.frederic.complaintapp.sync.SyncUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String AUTHORITY = ComplaintContentProvider.AUTHORITY;
-    public static final String ACCOUNT_TYPE = "complaint.account";
-    public static final String ACCOUNT = "dummy";
-
     private RecyclerView recyclerView;
-    private Account account;
     private ComplaintAdapter complaintAdapter;
     private Cursor cursor;
     private List<Complaint> complaintList = new ArrayList<>();
@@ -43,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         // Dummy account for synchronisation
-        account = createSyncAccount(this);
+        SyncUtils.CreateSyncAccount(this);
 
         setup();
     }
@@ -120,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         Bundle extras = new Bundle();
         extras.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
         extras.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        ContentResolver.requestSync(account, ComplaintContentProvider.AUTHORITY, extras);
+        ContentResolver.requestSync(StubAuthenticatorService.GetAccount(), ComplaintContentProvider.AUTHORITY, extras);
         complaintList.clear();
         complaintAdapter.notifyDataSetChanged();
         cursor = getContentResolver().query(
@@ -144,25 +142,4 @@ public class MainActivity extends AppCompatActivity {
 
         // TODO: Implement UI update, maybe LoaderManager
     }
-
-
-    public static Account createSyncAccount(Context context) {
-        Account account = new Account(ACCOUNT, ACCOUNT_TYPE);
-        AccountManager accountManager = (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
-        if (accountManager.addAccountExplicitly(account, null, null)) {
-            /*
-             * If you don't set android:syncable="true" in
-             * in your <provider> element in the manifest,
-             * then call context.setIsSyncable(account, AUTHORITY, 1)
-             * here.
-             */
-        } else {
-            /*
-             * The account exists or some other error occurred. Log this, report it,
-             * or handle it internally.
-             */
-        }
-        return account;
-    }
-
 }
