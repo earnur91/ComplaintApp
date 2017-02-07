@@ -47,6 +47,15 @@
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
+
+        <activity android:name=".CreateComplaintActivity"
+            android:label="@string/title_create_complaint"
+            android:parentActivityName=".MainActivity"
+            android:windowSoftInputMode="adjustPan">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
     </application>
 
 </manifest>

@@ -4,6 +4,7 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -65,10 +66,15 @@ public class MainActivity extends AppCompatActivity {
                 doManualSync();
                 return true;
             case R.id.action_create:
-                // TODO: implement
+                openCreateComplaintActivity();
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void openCreateComplaintActivity() {
+        Intent intent = new Intent(this, CreateComplaintActivity.class);
+        startActivity(intent);
     }
 
     @Override

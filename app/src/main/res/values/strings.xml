@@ -4,4 +4,6 @@
     <string name="sync_now">Synchronisieren</string>
     <string name="create_complaint">Erstellen</string>
     <string name="icon_description">Status Icon</string>
+    <string name="title_create_complaint">Beschwerde erstellen</string>
+    <string name="btn_create">Erstellen</string>
 </resources>
