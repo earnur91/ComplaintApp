@@ -140,7 +140,7 @@ public class RestClient {
      * @throws MalformedURLException
      */
     private static URL getBackendUrl() throws MalformedURLException {
-        return new URL("http://" + BACKEND_HOST + ":8080/complaint-backend-1.0-SNAPSHOT/api/complaint");
+        return new URL("http://" + BACKEND_HOST + ":8080/complaint-backend/api/complaint");
     }
 
     /**
