@@ -14,7 +14,7 @@ import org.huebner.frederic.complaintapp.content.ComplaintContentProvider;
  * Static helper methods for working with the sync framework.
  */
 public class SyncUtils {
-    private static final long SYNC_FREQUENCY = 60 * 60;  // 1 hour (in seconds)
+    private static final long SYNC_FREQUENCY = 60;  // 60 secons (minimum value)
     private static final String CONTENT_AUTHORITY = ComplaintContentProvider.AUTHORITY;
     private static final String PREF_SETUP_COMPLETE = "setup_complete";
 
@@ -38,8 +38,7 @@ public class SyncUtils {
             ContentResolver.setSyncAutomatically(account, CONTENT_AUTHORITY, true);
             // Recommend a schedule for automatic synchronization. The system may modify this based
             // on other scheduled syncs and network utilization.
-            ContentResolver.addPeriodicSync(
-                    account, CONTENT_AUTHORITY, new Bundle(), SYNC_FREQUENCY);
+            ContentResolver.addPeriodicSync(account, CONTENT_AUTHORITY, new Bundle(), SYNC_FREQUENCY);
             newAccount = true;
         }
 
@@ -47,7 +46,7 @@ public class SyncUtils {
         // data has been deleted. (Note that it's possible to clear app data WITHOUT affecting
         // the account list, so wee need to check both.)
         if (newAccount || !setupComplete) {
-            TriggerRefresh();
+            TriggerRefresh(false);
             PreferenceManager.getDefaultSharedPreferences(context).edit()
                     .putBoolean(PREF_SETUP_COMPLETE, true).commit();
         }
@@ -64,8 +63,9 @@ public class SyncUtils {
      * but the user is not actively waiting for that data, you should omit this flag; this will give
      * the OS additional freedom in scheduling your sync request.
      */
-    public static void TriggerRefresh() {
+    public static void TriggerRefresh(Boolean upload) {
         Bundle b = new Bundle();
+        b.putBoolean(ContentResolver.SYNC_EXTRAS_UPLOAD, upload);
         // Disable sync backoff and ignore sync preferences. In other words...perform sync NOW!
         b.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
         b.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);

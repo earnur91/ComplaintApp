@@ -13,6 +13,7 @@ import org.huebner.frederic.complaintapp.content.Complaint;
 import org.huebner.frederic.complaintapp.content.ComplaintContentProvider;
 import org.huebner.frederic.complaintapp.content.ProcessingStatus;
 import org.huebner.frederic.complaintapp.content.SyncState;
+import org.huebner.frederic.complaintapp.sync.SyncUtils;
 
 public class CreateComplaintActivity extends AppCompatActivity {
 
@@ -44,7 +45,6 @@ public class CreateComplaintActivity extends AppCompatActivity {
         contentValues.put(Complaint.LOCATION, locationEdit.getText().toString());
         contentValues.put(Complaint.COMPLAINT_TEXT, complaintTextEdit.getText().toString());
         contentValues.put(Complaint.PROCESSING_STATUS, ProcessingStatus.CREATED.name());
-        contentValues.put(Complaint.SYNC_STATE, SyncState.CREATE.name());
         getContentResolver().insert(ComplaintContentProvider.CONTENT_URI, contentValues);
 
         requestUpload();
@@ -52,14 +52,6 @@ public class CreateComplaintActivity extends AppCompatActivity {
     }
 
     private void requestUpload() {
-        requestSync(true);
-    }
-
-    private void requestSync(boolean upload) {
-//        Bundle extras = new Bundle();
-//        extras.putBoolean(ContentResolver.SYNC_EXTRAS_UPLOAD, upload);
-//        extras.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-//
-//        ContentResolver.requestSync(, ComplaintContentProvider.AUTHORITY, extras);
+        SyncUtils.TriggerRefresh(true);
     }
 }
